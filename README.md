@@ -2,7 +2,7 @@
 
 ### Overview
 
-Bamazon is an app that takes in orders from customers and deplete stock from the store's inventory. 
+Bamazon is an app that takes in orders from customers and depletes stock from the store's inventory. 
 
 ## Repository
 
