@@ -54,5 +54,5 @@ https://github.com/DarjeelingLimited/bamazon
      
 ## "Products" database
 
-* Upon running the command, if the user input is less than or equal to the "product_quantity", the "product_quantity" reflect the new amount of inventory left in stock. 
+* Upon running the command, if the user input is less than or equal to the "product_quantity", the "product_quantity" reflects the new amount of inventory left in stock. 
 
