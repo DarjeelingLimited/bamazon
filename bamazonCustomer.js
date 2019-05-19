@@ -3,6 +3,8 @@
 var inquirer = require("inquirer");
 // mysql
 var mysql = require("mysql");
+// var table = require("table")
+// I tried to print the data to a table but wasn't successful here.
 
 var connection = mysql.createConnection({
     host: "localhost",
@@ -36,48 +38,51 @@ function runSearch() {
         .prompt([
             /* Put questions here*/
             {
-                name: "action",
+                name: "prodid",
                 type: "input",
                 //* The first should ask them the ID of the product they would like to buy.
                 message: "Please input the product ID.",
             },
-            //The second message should ask how many units of the product they would like to buy.
+           // The second message should ask how many units of the product they would like to buy.
             {
-                name: "action",
+                name: "quant",
                 type: "input",
                 message: "How many units would you like to buy?"
             }
-        ]).then(answers => {
+        ]).then(function(answers) {
             //Use user feedback to do case statements
-            var userID = answers.ID;
-            console.log("You entered " + userID)
-            var userQuantity = answers.Quantity;
-            console.log("You're looking for " + userQuantity + userID);
+            var userID = answers.prodid;
+            //console.log(answers.prodid);
+            console.log("You entered Product ID " + userID)
+            var userQuantity = answers.quant;
+            console.log("You're looking for " + userQuantity + " of Product ID " + userID);
 
             //check to see if there is enough product to meet the customer request
-            connection.query("SELECT * from products WHERE item_id= " + ID, function (err, res) {
+            connection.query("SELECT * from products WHERE item_id= " + userID, function (err, res) {
                 if (err) throw err;
-                console.log(res);
+               // console.log(res);
 
                 // if there is enough quantity, fulfill the order
                 var inStock = res[0].stock_quantity;
-                console.log("Good news! Your item is in stock: " + inStock + "remain");
-                var remainingStock = inStock - answerQuantity;
-                console.log("Remaining items in stock: " + remainingStock);
-                var cost = res[0].price;
+                console.log("Your item is in stock: " + inStock + " available");
+                
 
                 // once the udpate goes thru --> show the customer the total cost of their purchase
                 // i.e. # products - # purchased - remainder
-                if (inStock >= answers.Quantity) {
-                    console.log("Remaining items: " + remainingStock);
-                    console.log("Your total today is " + (answerQuantity * price));
+                if (inStock >= userQuantity) {
+                    var remainingStock = inStock - userQuantity;
+                    var cost = res[0].price;
+                    console.log("We have reserved " + userQuantity + " units for you.");
+                    var roundedNumber = Math.round((userQuantity * cost)*100)/100;
+                    console.log("Your total today is: $ " + roundedNumber);
                     // update the SQL database to reflect remaining quantity
-                    connection.query("UPDATE products SET stock_quantity -" + answers.Quantity + "WHERE ID = " 
-                    + answers.ID);
+                    console.log("Remaining inventory in stock: " + remainingStock);
+                    connection.query("UPDATE products SET stock_quantity = " + remainingStock + " WHERE item_id = " 
+                    + userID);
                 }
                 else{
                                 // if no -> the app should log something like "Insufficient quantity" & prevent the order from going thru
-                    console.log("Insufficient quantity. Come back next time!");
+                    console.log("Insufficient quantity. We are short " + (userQuantity - inStock) + " units. Come back next time!");
                 }
                 connection.end();
             });
